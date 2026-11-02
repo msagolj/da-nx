@@ -109,7 +109,7 @@ conversation messages or install global S2 tokens.
 | Properties (`--nx-chat-input-` prefix) | Purpose |
 |---|---|
 | `working-background`, `working-border`, `working-color` | Neutral working surface: 80% fill, 6% border, 56% text, preserving the light/dark palette. |
-| `working-shadow` | Compact working-state shadow; the expanded composer skin has independent state-specific artwork. |
+| `working-shadow` | Compact working-state shadow; the expanded AO input owns its state-specific artwork. |
 | `spinner-size`, `spinner-track`, `spinner-arc`, `stroke-width` | 16px progress indicator with a 2px gray track and blue arc. Palette colors use existing S2 tokens with theme-safe fallbacks. |
 | `logo-size` | 20px logo, 22px in M. The spinner advances from 16px to 18px. |
 | `expanded-inset`, `row-height`, `expanded-line-height`, `max-height`, `max-width` | 6px inset, 21px expanded S row/line, 240px height cap and 720px chat column/popover limit. M uses 18px text with the 1.5 body line height (27px). |
@@ -119,32 +119,23 @@ Both chat elements accept `size="m"` and retain their drafts on size changes.
 Context pills follow the input size; menus and the prompts chooser keep their own variants.
 The shared button classes own all action dimensions through `--nx-btn-height`
 and `--nx-btn-icon-size`: compact uses small/default (24/32px), expanded uses
-default/large (32/40px). `stop-size` remains an optional circle-size override;
-without it Stop follows the same button class as Add, Send and voice.
+default/large (32/40px). Stop follows the same button class as Add, Send and voice.
 
 Override these properties on the actual input host (`nx-chat` or `nx-ao-input`).
-AO-only focus properties live in `chat-ao/input.css` under `--nx-ao-input-*`.
-That namespace also owns `voice-pulse-duration` and `voice-pulse-opacity`.
 Expanded layout remains distinct from the compact sidebar; naming its metrics
 does not make the two surfaces the same size.
 
-## Expanded composer skin
+## Expanded chat input
 
-Adopt `nx2/blocks/shared/chat/input.css` and `composer.css` in the containing
-component's shadow root. Wrap the input in `.nx-chat-composer`, with an
-`aria-hidden="true"` `.nx-chat-composer-surface` as its first direct child.
-The skin owns the 24px radius, 6px frame, pastel glow, and idle, ready, focus,
-working and drop shadows through `--nx-chat-composer-*` properties.
-Override those properties on the containing host.
+Use `<nx-ao-input variant="expanded">` directly. The input owns its 24px radius,
+6px frame, pastel glow, and ready, focus, working and drop states. No outer skin,
+state classes or extra stylesheet is required. Focus shows a theme-aware 2px
+S2 blue outline. The host owns page width and positioning.
 
-An enabled native textarea activates the ready state. For shadow-DOM inputs,
-the host supplies `is-enabled`; `is-processing` and `is-dropzone` reflect the
-input's other states. Focus is detected with `:focus-within`, including across
-the input's shadow root, and shows a 2px outline using `--nx-chat-composer-focus-color`
-(S2 blue-900 by default). The skin leaves
-page width and positioning to the host. Input metrics and button classes
-continue to own S/M sizing; the frame retains its 16px padding in both sizes.
-Compact input styles remain independent.
+The frame keeps 16px padding in S and M. Compact sidebar styling stays unchanged.
+Hosts using a native fallback form keep that form's artwork in their own CSS.
+Both conversation elements expose `openAddAction(id)` for opening their Add menu
+actions after rendering, including restoring a queued legacy draft first.
 
 ## Selection context
 

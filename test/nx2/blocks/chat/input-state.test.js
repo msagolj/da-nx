@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import '../../../../nx2/blocks/chat/chat.js';
 import '../../../../nx2/blocks/chat-ao/chat-ao.js';
 import { CHAT_EVENT } from '../../../../nx2/utils/chat.js';
+import { MENU_OPTIONS } from '../../../../nx2/blocks/shared/chat/constants.js';
 
 describe('chat input coordination', () => {
   let chat;
@@ -46,6 +47,16 @@ describe('chat input coordination', () => {
   }
 
   ['nx-chat', 'nx-chat-ao'].forEach((tag) => {
+    it(`${tag} opens a file action through its public API without losing a staged draft`, async () => {
+      const input = await mount(tag);
+      chat.connected = true;
+      await chat.setPrompt('Keep this draft', { replace: false });
+      const click = sinon.stub(inputRoot().querySelector('.chat-file-input'), 'click');
+      await chat.openAddAction(MENU_OPTIONS.FILES);
+      expect(click.calledOnce).to.equal(true);
+      expect(input.value).to.equal('Keep this draft');
+    });
+
     it(`${tag} broadcasts processing state and preserves the disabled draft until completion`, async () => {
       const input = await mount(tag);
       chat.connected = true;
@@ -227,7 +238,6 @@ describe('chat input coordination', () => {
       host.style.setProperty('--nx-chat-input-working-background', 'rgb(12 34 56)');
       host.style.setProperty('--nx-chat-input-working-shadow', 'none');
       host.style.setProperty('--nx-chat-input-spinner-size', '18px');
-      host.style.setProperty('--nx-chat-input-stop-size', '32px');
       chat.connected = true;
       chat.thinking = true;
       await chat.updateComplete;
@@ -236,7 +246,7 @@ describe('chat input coordination', () => {
       expect(getComputedStyle(form).backgroundColor).to.equal('rgb(12, 34, 56)');
       expect(getComputedStyle(form).boxShadow).to.equal('none');
       expect(form.querySelector('.nx-loading-spinner').getBoundingClientRect().width).to.equal(18);
-      expect(form.querySelector('.chat-stop').getBoundingClientRect().width).to.equal(32);
+      expect(form.querySelector('.chat-stop').getBoundingClientRect().width).to.equal(24);
       expect(textarea.value).to.equal('Keep this draft');
     });
 
@@ -310,14 +320,14 @@ describe('chat input coordination', () => {
     textarea.value = 'Keep this draft';
     const form = inputRoot().querySelector('form');
     const send = inputRoot().querySelector('.chat-send');
-    expect(form.getBoundingClientRect().height).to.equal(77);
+    expect(form.getBoundingClientRect().height).to.equal(109);
     expect(send.getBoundingClientRect().width).to.equal(32);
     expect(getComputedStyle(textarea).fontSize).to.equal('16px');
     chat.thinking = true;
     await chat.updateComplete;
     await input.updateComplete;
     const stop = inputRoot().querySelector('.chat-stop');
-    expect(form.getBoundingClientRect().height).to.equal(77);
+    expect(form.getBoundingClientRect().height).to.equal(109);
     expect(stop.getBoundingClientRect().width).to.equal(32);
     expect(getComputedStyle(stop).borderRadius).to.equal('50%');
     expect(getComputedStyle(form).backgroundColor).to.equal('rgba(0, 0, 0, 0)');
@@ -327,7 +337,7 @@ describe('chat input coordination', () => {
     expect(stop.getBoundingClientRect().width).to.equal(40);
     expect(getComputedStyle(textarea).fontSize).to.equal('18px');
     expect(getComputedStyle(textarea).lineHeight).to.equal('27px');
-    expect(form.getBoundingClientRect().height).to.equal(91);
+    expect(form.getBoundingClientRect().height).to.equal(123);
     expect(inputRoot().querySelector('.nx-loading-spinner').getBoundingClientRect().width).to.equal(18);
     chat.thinking = false;
     await chat.updateComplete;

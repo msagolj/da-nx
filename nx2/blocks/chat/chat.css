@@ -662,8 +662,8 @@
 :host([showinputstatus]) .chat-actions .chat-stop {
   box-sizing: border-box;
   flex-shrink: 0;
-  width: var(--nx-chat-input-stop-size, var(--nx-btn-height));
-  height: var(--nx-chat-input-stop-size, var(--nx-btn-height));
+  width: var(--nx-btn-height);
+  height: var(--nx-btn-height);
   padding: 0;
   border-radius: 50%;
 }

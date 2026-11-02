@@ -248,6 +248,11 @@ export default class NxAoInput extends LitElement {
     target.value = '';
   }
 
+  async openAddAction(id) {
+    await this.updateComplete;
+    return this._handleMenuSelect({ detail: { id } });
+  }
+
   render() {
     const working = this.showInputStatus && this.blocked;
     const pendingStatus = this._readingFiles ? 'Reading files...' : this.statusMessage;
@@ -267,13 +272,14 @@ export default class NxAoInput extends LitElement {
         @select=${({ detail }) => this._onSlashSelect(detail.id)}
         @mousedown=${(e) => e.preventDefault()}
       ></nx-menu>
-      <form class="chat-form ${working ? 'is-processing' : ''}" aria-busy=${!!(this.blocked || this._submitting || this._readingFiles || this.statusMessage)}
+      <form class="chat-form ${working ? 'is-processing' : ''} ${this._dragging && !this._disabled ? 'is-dropzone' : ''}" aria-busy=${!!(this.blocked || this._submitting || this._readingFiles || this.statusMessage)}
         @submit=${this._submit}
         @dragenter=${this._dnd.onDragEnter}
         @dragleave=${this._dnd.onDragLeave}
         @dragover=${this._dnd.onDragOver}
         @drop=${this._dnd.onDrop}
       >
+        ${this.variant === 'expanded' ? html`<div class="chat-surface" aria-hidden="true"></div>` : nothing}
         ${this._dragging && !this._disabled ? html`
           <div class="chat-drop-zone" aria-hidden="true">
             <span class="chat-drop-title">Drop a file to add context</span>
