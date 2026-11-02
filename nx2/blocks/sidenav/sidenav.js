@@ -15,6 +15,7 @@ const styles = await Promise.all([
   loadStyle(new URL('../../styles/buttons.css', import.meta.url).href),
 ]);
 const CHAT_ICON_HREF = `${codeBase}/img/icons/${ICON_NAMES.coworker}.svg#icon`;
+const CHAT_BACKGROUND_HREF = new URL('./coworker-background.svg', import.meta.url).href;
 
 class NXSidenav extends LitElement {
   static properties = {
@@ -122,7 +123,15 @@ class NXSidenav extends LitElement {
     return this.path || DEFAULT_NAV_PATH;
   }
 
+  _renderChatIcon() {
+    return html`
+      <span class="icon" aria-hidden="true" style=${`--nx-sidenav-chat-background: url('${CHAT_BACKGROUND_HREF}')`}>
+        <svg viewBox="0 0 20 20"><use href=${CHAT_ICON_HREF}></use></svg>
+      </span>`;
+  }
+
   _renderActionIcon(action) {
+    if (action.section === 'chat') return this._renderChatIcon();
     if (action.active && action.activeIcon) {
       return html`<svg viewBox="0 0 20 20" aria-hidden="true"><use href=${action.activeIcon}></use></svg>`;
     }
@@ -150,7 +159,7 @@ class NXSidenav extends LitElement {
     return html`
       <ul>
         ${this.actions?.map((action) => html`
-          <li class="nav-action">
+          <li class="nav-action${action.section === 'chat' ? ' nav-link chat' : ''}${action.active ? ' is-active' : ''}">
             <button type="button" class="nx-action-btn-icon ${action.active ? 'is-active' : ''}"
               aria-label=${action.label} title=${action.label}
               aria-pressed=${action.active ?? nothing}
@@ -163,9 +172,7 @@ class NXSidenav extends LitElement {
           ${!hostChat && this._chatEnabled && this._hasChatPanel && index === homeIndex ? html`
             <li class="nav-link chat ${chatOpen ? 'is-active' : ''} ${this._chatPanelState === 'restoring' ? 'is-restoring' : ''}">
               <button type="button" aria-label=${chatOpen ? 'Close chat' : 'Open chat'} aria-expanded=${chatOpen ? 'true' : 'false'} aria-disabled=${this._chatChecking && !chatOpen ? 'true' : 'false'} title="Chat" @click=${this.toggleChat}>
-                <span class="icon" aria-hidden="true">
-                  <svg viewBox="0 0 20 20"><use href=${CHAT_ICON_HREF}></use></svg>
-                </span>
+                ${this._renderChatIcon()}
               </button>
             </li>
           ` : nothing}

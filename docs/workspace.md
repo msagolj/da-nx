@@ -35,8 +35,9 @@ as overflowing SVG artwork; other URLs render as images. Optional `active`
 sets the selected circle and pressed state; `activeIcon` supplies its 18px SVG
 glyph. Hosts update `actions` to reflect availability and panel visibility and
 remove their descriptors on disconnection; other menus have no added actions.
-An action with `section: 'chat'` replaces the built-in Chat toggle while present,
-so hosts can supply artwork without adding a second control for the same panel.
+An action with `section: 'chat'` replaces the built-in Chat toggle while present.
+It reuses the native 32px gradient badge and 18px shared Coworker glyph, with the
+same selected appearance. Hosts supply behavior and state, not separate icons.
 
 ### Backend communication
 - Use `daFetch` from `nx2/utils/daFetch.js` to fetch data from the backend

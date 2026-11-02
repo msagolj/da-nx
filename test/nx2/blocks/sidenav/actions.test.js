@@ -51,11 +51,49 @@ describe('sidenav actions', () => {
     await nav.updateComplete;
     expect(nav.shadowRoot.querySelectorAll('button')).to.have.length(1);
     expect(nav.shadowRoot.querySelector('.nav-action')).not.to.equal(null);
-    expect(nav.shadowRoot.querySelector('.nav-link.chat')).to.equal(null);
+    expect(nav.shadowRoot.querySelectorAll('.nav-link.chat')).to.have.length(1);
+    expect(nav.shadowRoot.querySelector('.nav-link.chat'))
+      .to.equal(nav.shadowRoot.querySelector('.nav-action'));
     nav.actions = [];
     await nav.updateComplete;
     expect(nav.shadowRoot.querySelectorAll('button')).to.have.length(1);
     expect(nav.shadowRoot.querySelector('.nav-link.chat')).not.to.equal(null);
+  });
+
+  it('keeps the host Chat glyph compact and restores its gradient after closing in both themes', async () => {
+    nav._chatEnabled = true;
+    nav._hasChatPanel = true;
+    nav.style.setProperty('--nx-sidenav-action-icon-size', '40px');
+    for (const scheme of ['light', 'dark']) {
+      nav.style.colorScheme = scheme;
+      nav.actions = [{ section: 'chat', label: 'Open chat', active: false }];
+      await nav.updateComplete;
+      const row = nav.shadowRoot.querySelector('.nav-action.chat');
+      const button = row.querySelector('button');
+      const badge = row.querySelector('.icon');
+      const glyph = badge.querySelector('svg');
+      const background = getComputedStyle(badge).backgroundImage;
+      expect(nav.shadowRoot.querySelectorAll('.chat')).to.have.length(1);
+      expect(row.getBoundingClientRect().height).to.equal(32);
+      expect(button.getBoundingClientRect().width).to.equal(32);
+      expect(badge.getBoundingClientRect().width).to.equal(32);
+      expect(glyph.getBoundingClientRect().width).to.equal(18);
+      expect(glyph.getBoundingClientRect().height).to.equal(18);
+      expect(glyph.viewBox.baseVal.width).to.equal(20);
+      expect(background).to.include('/sidenav/coworker-background.svg');
+      const image = new Image();
+      const [, href] = background.match(/url\("([^"]+)"\)/);
+      image.src = href;
+      await image.decode();
+      nav.actions = [{ ...nav.actions[0], active: true }];
+      await nav.updateComplete;
+      expect(getComputedStyle(badge).backgroundImage).to.equal('none');
+      expect(glyph.getBoundingClientRect().width).to.equal(18);
+      expect(row.getBoundingClientRect().height).to.equal(32);
+      nav.actions = [{ ...nav.actions[0], active: false }];
+      await nav.updateComplete;
+      expect(getComputedStyle(badge).backgroundImage).to.equal(background);
+    }
   });
 
   it('sizes host action graphics through their component property', async () => {
